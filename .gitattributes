@@ -1,0 +1,5 @@
+*.tgs binary
+*.webm binary
+*.gif binary
+*.png binary
+04-editable-project/tools/ffmpeg binary

@@ -1,0 +1,25 @@
+# macOS and editor state
+.DS_Store
+.idea/
+.vscode/
+
+# Python runtime output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Local configuration and temporary artefacts
+.env
+.env.*
+!.env.example
+*.log
+*.tmp
+.superpowers/
+
+# Git worktrees must never be committed into the pack itself.
+.worktrees/
+worktrees/
