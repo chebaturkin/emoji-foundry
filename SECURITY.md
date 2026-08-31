@@ -1,3 +1,3 @@
-# Security
+# Безопасность
 
-Emoji Foundry is a private creative project. If you have access and find a credential, private file, or vulnerability that should not be present, do not open an issue or share it elsewhere. Contact the repository owner privately and include only the minimum information needed to reproduce the problem.
+Emoji Foundry — приватный творческий проект. Если у тебя есть доступ и ты обнаружил учётные данные, приватный файл или уязвимость, которых здесь быть не должно, не создавай issue и не передавай информацию третьим лицам. Свяжись с владельцем репозитория приватно и сообщи только минимум, необходимый для воспроизведения проблемы.

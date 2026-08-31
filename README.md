@@ -1,75 +1,77 @@
 # Emoji Foundry
 
 <p align="center">
-  <img src="03-previews/review/current/static-100-dark.png" alt="Emoji Foundry — 27 Telegram custom emoji" width="720">
+  <img src="03-previews/review/current/static-100-dark.png" alt="Emoji Foundry — 27 анимированных custom emoji для Telegram" width="720">
 </p>
 
-**Emoji Foundry** is a private creative workspace for designing, animating, validating, and packaging a cohesive Telegram custom emoji pack. It currently contains 27 hand-drawn paper-like emoji with a strict four-colour visual system and vector-first Telegram delivery.
+> Приватная творческая мастерская для 27 цельных, рисованных от руки custom emoji для Telegram.
 
-This repository is intentionally private. It is the source of truth for the current pack, not a public generator or a licensed asset library.
+**Emoji Foundry** — исходник, сборочная система и готовый пакет авторских анимированных emoji. Все символы выполнены как бумажные объекты в единой четырёхцветной системе; основной формат доставки в Telegram — векторный TGS.
 
-## What is inside
+Репозиторий намеренно приватный. Это единственный актуальный источник пака, а не публичный генератор или библиотека ассетов.
 
-- 27 animated custom emoji in **TGS** — the primary Telegram upload format.
-- VP9-with-alpha **WebM** fallbacks.
-- Static PNG exports at 100 × 100 and editable 400 × 400.
-- A Python animation system with tactile, frame-based motion.
-- Validators for Telegram dimensions, duration, safe area, palette, alpha, TGS structure, and file size.
-- Current 100 × 100 review boards on light and dark backgrounds.
+## Что внутри
 
-## The visual system
+- 27 анимированных custom emoji в **TGS** — основном формате загрузки в Telegram.
+- Резервные **WebM** с VP9 и прозрачностью.
+- Статичные PNG 100 × 100 и редактируемые PNG 400 × 400.
+- Python-система покадровой тактильной анимации.
+- Валидаторы размеров Telegram, длительности, безопасной зоны, палитры, альфа-канала, структуры TGS и размера файлов.
+- Актуальные review-boards 100 × 100 на светлом и тёмном фоне.
 
-Visible emoji artwork uses only these four colours:
+## Визуальная система
 
-| Role | Name | Hex |
+В видимых частях emoji разрешены только четыре цвета:
+
+| Роль | Имя | Hex |
 | --- | --- | --- |
-| Primary silhouette, contour, depth | BLUE | `#2E3A4D` |
-| Warm secondary material | TAUPE | `#C4C1B4` |
-| Paper, highlights, light lettering | PAPER | `#F2F0E9` |
-| Rare high-contrast internal detail | INK | `#0D0D0D` |
+| Основной силуэт, контур и глубина | BLUE | `#2E3A4D` |
+| Тёплый вторичный материал | TAUPE | `#C4C1B4` |
+| Бумага, блики и светлые буквы | PAPER | `#F2F0E9` |
+| Редкая контрастная внутренняя деталь | INK | `#0D0D0D` |
 
-Every animation follows the same physical rhythm: anticipation → meaningful action → short material reaction → natural return. Global pulse/fade animation, glitches, rectangular reveals, and arbitrary fragments are not part of the pack language.
+Каждая анимация следует одной физической логике: предвосхищение → осмысленное действие → короткая реакция материала → естественное возвращение. Общая пульсация и fade, glitch, прямоугольные раскрытия и случайные фрагменты не входят в язык пака.
 
-The active visual decisions are documented in [CURRENT_STATE.md](05-ai-handoff/CURRENT_STATE.md) and [STYLE_SYSTEM.md](05-ai-handoff/STYLE_SYSTEM.md).
+Актуальные визуальные решения зафиксированы в [CURRENT_STATE.md](05-ai-handoff/CURRENT_STATE.md) и [STYLE_SYSTEM.md](05-ai-handoff/STYLE_SYSTEM.md).
 
-## Repository map
+## Карта репозитория
 
 ```text
-01-ready-to-upload/    Final TGS and WebM files for Telegram
-02-static-png/         Static PNG exports
-03-previews/           Review boards and preview GIFs
-04-editable-project/   Python sources, motion modules, tests, and build tools
-05-ai-handoff/         Current rules and machine-readable pack manifest
+01-ready-to-upload/    Готовые TGS и WebM для Telegram
+02-static-png/         Статичные PNG-экспорты
+03-previews/           Review-boards и GIF-превью
+04-editable-project/   Python-исходники, модули анимации, тесты и сборщики
+05-ai-handoff/         Актуальные правила и машиночитаемый манифест пака
 ```
 
-The canonical animation modules are in `04-editable-project/frame_motions`. Files in release directories, `frames`, `upload`, `tgs_upload`, and `previews` are generated outputs.
+Канонические модули анимации находятся в `04-editable-project/frame_motions`. Файлы в release-папках, `frames`, `upload`, `tgs_upload` и `previews` генерируются автоматически.
 
-## Quick start
+## Быстрый старт
 
-Requirements:
+Требования:
 
 - Python 3.10+
-- Dependencies from `04-editable-project/requirements.txt`
-- `04-editable-project/tools/ffmpeg` with `libvpx-vp9` support; the bundled file targets macOS arm64.
+- Зависимости из `04-editable-project/requirements.txt`
+- `04-editable-project/tools/ffmpeg` с поддержкой `libvpx-vp9`; встроенный файл рассчитан на macOS arm64.
 
 ```bash
 cd 04-editable-project
 python3 -m pip install -r requirements.txt
 
-# Rebuild and validate one or more emoji.
+# Пересобрать и проверить один или несколько emoji.
 python3 pack.py build --only 20-check,22-favorite
 
-# Generate actual 100 × 100 review boards.
+# Создать review-boards в реальном размере 100 × 100.
 python3 pack.py review --only 20-check,22-favorite
 
-# Rebuild the full pack, run the quality gate, stage the release, synchronise
-# release folders, and update SHA-256 checksums.
+# Пересобрать весь пак, пройти quality gate, собрать release во временную папку,
+# синхронизировать release-папки и обновить SHA-256-контрольные суммы.
 python3 pack.py release
 ```
 
-## Quality gate
+## Проверка качества
 
-Before any handoff or Telegram upload, run:
+Перед передачей или загрузкой в Telegram запусти:
 
 ```bash
 cd 04-editable-project
@@ -78,28 +80,28 @@ python3 validate_animated.py
 python3 validate_tgs.py
 ```
 
-The current review artefacts live in `03-previews/review/current/`. Judge line weight and readability at 100 × 100 first; the editable 400 × 400 renders are supporting material only.
+Актуальные материалы для review лежат в `03-previews/review/current/`. Сначала оценивай вес линий и читаемость в 100 × 100; рендеры 400 × 400 нужны только как вспомогательный материал.
 
-## Editing an emoji
+## Как изменить emoji
 
-1. Read [AGENTS.md](AGENTS.md), then the documents in `05-ai-handoff/`.
-2. Locate the target stem in `04-editable-project/pack_registry.py` and its `frame_motions/mXX_name.py` module.
-3. Add a narrow regression test and observe it fail before changing animation behaviour.
-4. Run `python3 pack.py build --only <stem>` and `python3 pack.py review --only <stem>`.
-5. Run the full quality gate before release.
+1. Прочитай [AGENTS.md](AGENTS.md), затем документы в `05-ai-handoff/`.
+2. Найди целевой stem в `04-editable-project/pack_registry.py` и его модуль `frame_motions/mXX_name.py`.
+3. Добавь узкий regression test и убедись, что он падает до изменения поведения анимации.
+4. Запусти `python3 pack.py build --only <stem>` и `python3 pack.py review --only <stem>`.
+5. Перед release пройди полный quality gate.
 
-`20-check`, `22-favorite`, and `27-ira-heart` render their release statics from canonical vector frames. Other approved static compositions remain explicitly sourced from their master PNG; the selection is recorded in `pack_registry.py` and the manifest.
+`20-check`, `22-favorite` и `27-ira-heart` рендерят release-статику из канонических векторных кадров. Остальные утверждённые статичные композиции явно используют master PNG; выбор зафиксирован в `pack_registry.py` и манифесте.
 
-## Current status
+## Текущий статус
 
-- 27/27 TGS files
-- 27/27 WebM files
-- 27/27 static PNG files
-- 232 automated tests
-- SHA-256 manifest for the complete local release package
+- 27/27 TGS-файлов
+- 27/27 WebM-файлов
+- 27/27 статичных PNG
+- 232 автоматизированных теста
+- SHA-256-манифест полного локального release-пакета
 
-## Ownership and contributions
+## Права и участие
 
-This is a private repository. No licence is granted for the code, visual assets, name, or personal marks. Do not redistribute, reuse, or publish its contents without the repository owner’s written permission.
+Это приватный репозиторий. На код, визуальные ассеты, название и персональные знаки не выдаётся лицензия. Не распространяй, не используй повторно и не публикуй его содержимое без письменного разрешения владельца.
 
-For future collaboration rules, see [CONTRIBUTING.md](CONTRIBUTING.md). Security reports are described in [SECURITY.md](SECURITY.md).
+Правила будущей совместной работы находятся в [CONTRIBUTING.md](CONTRIBUTING.md). Порядок сообщений о проблемах безопасности описан в [SECURITY.md](SECURITY.md).

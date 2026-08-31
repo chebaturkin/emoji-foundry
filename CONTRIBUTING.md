@@ -1,15 +1,15 @@
-# Contributing to Emoji Foundry
+# Участие в Emoji Foundry
 
-Emoji Foundry is currently a private, owner-led project. Changes are made only with explicit approval from the repository owner.
+Emoji Foundry — приватный проект, который ведёт владелец. Любые изменения вносятся только с его явного одобрения.
 
-## Before changing anything
+## Перед началом работы
 
-1. Read `AGENTS.md`.
-2. Read `05-ai-handoff/CURRENT_STATE.md`, `STYLE_SYSTEM.md`, and `emoji-manifest.json`.
-3. Treat `04-editable-project/frame_motions` as canonical source; do not edit generated release files by hand.
-4. Change only the requested emoji and its focused tests.
+1. Прочитай `AGENTS.md`.
+2. Прочитай `05-ai-handoff/CURRENT_STATE.md`, `STYLE_SYSTEM.md` и `emoji-manifest.json`.
+3. Считай `04-editable-project/frame_motions` каноническим источником; не редактируй сгенерированные release-файлы вручную.
+4. Меняй только запрошенный emoji и его целевые тесты.
 
-## Required workflow
+## Обязательный порядок работы
 
 ```bash
 cd 04-editable-project
@@ -20,11 +20,11 @@ python3 validate_animated.py
 python3 validate_tgs.py
 ```
 
-Use `python3 pack.py release` only when the full pack is ready to be synchronised. It stages the release before replacing generated release folders and refreshes `SHA256SUMS` afterward.
+Используй `python3 pack.py release`, только когда весь пак готов к синхронизации. Команда сначала собирает release во временную папку, затем заменяет сгенерированные release-папки и обновляет `SHA256SUMS`.
 
-## Design boundaries
+## Границы дизайна
 
-- Use only BLUE, TAUPE, PAPER, and INK in visible artwork.
-- Compare readability in the generated 100 × 100 boards, not only at 400 × 400.
-- Preserve personal content such as `27-ira-heart` unless it is explicitly in scope.
-- Do not add a licence or make the repository public without owner approval.
+- Используй в видимой графике только BLUE, TAUPE, PAPER и INK.
+- Сравнивай читаемость в сгенерированных boards 100 × 100, а не только в 400 × 400.
+- Не меняй персональный контент, например `27-ira-heart`, если он прямо не входит в задачу.
+- Не добавляй лицензию и не делай репозиторий публичным без одобрения владельца.

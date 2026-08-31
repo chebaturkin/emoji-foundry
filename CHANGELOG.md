@@ -1,12 +1,12 @@
-# Changelog
+# История изменений
 
-## Unreleased
+## Текущая версия
 
-- Prepared the project for its first private GitHub release as **Emoji Foundry**.
-- Added a repository README, contribution rules, and private-project security guidance.
-- Added a unified `pack.py` workflow, canonical pack registry, active handoff documents, and 100 × 100 review boards.
+- Проект подготовлен к первому приватному GitHub-релизу под именем **Emoji Foundry**.
+- Добавлены README репозитория, правила участия и инструкции по безопасности приватного проекта.
+- Добавлены единый workflow `pack.py`, канонический реестр пака, актуальные handoff-документы и review-boards 100 × 100.
 
-## Pack foundation
+## Основа пака
 
-- Built a 27-item vector-first Telegram custom emoji pack with TGS and WebM outputs.
-- Established the four-colour paper-material visual system and Telegram validation gates.
+- Собран набор из 27 Telegram custom emoji с приоритетом векторного TGS и резервным WebM.
+- Зафиксированы четырёхцветная система бумажных материалов и проверки требований Telegram.
