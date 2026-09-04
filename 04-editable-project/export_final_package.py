@@ -57,16 +57,13 @@ SOURCE_DIRECTORIES = (
 SOURCE_FILES = (
     "README.md",
     "build_all.py",
-    "build_batch_qa.py",
     "build_preview.py",
-    "build_tactile_qa.py",
     "validate_animated.py",
     "build_tgs.py",
     "validate_tgs.py",
     "export_final_package.py",
     "pack.py",
     "pack_registry.py",
-    "renumber_pack.py",
     "pytest.ini",
     "requirements.txt",
 )
@@ -88,7 +85,8 @@ def build_manifest() -> dict:
         stem = entry.stem
         spec = SPECS[stem]
         master = (
-            f"04-editable-project/masters/{stem}.png" if index <= 26 else None
+            f"04-editable-project/masters/{stem}.png"
+            if entry.static_source == "master" else None
         )
         items.append(
             {
@@ -131,8 +129,8 @@ def build_manifest() -> dict:
 
 
 def validate_source_project(source_root: Path = ROOT) -> None:
-    if len(SPECS) != 27 or len(PACK_ENTRIES) != 27:
-        raise ValueError("expected exactly 27 registered emoji and metadata entries")
+    if len(SPECS) != 4 or len(PACK_ENTRIES) != 4:
+        raise ValueError("expected exactly 4 registered emoji and metadata entries")
     expected_webm = {f"{stem}.webm" for stem in SPECS}
     actual_webm = {path.name for path in (source_root / "upload").glob("*.webm")}
     if actual_webm != expected_webm:
@@ -141,7 +139,10 @@ def validate_source_project(source_root: Path = ROOT) -> None:
     actual_tgs = {path.name for path in (source_root / "tgs_upload").glob("*.tgs")}
     if actual_tgs != expected_tgs:
         raise ValueError("upload TGS inventory does not match the registry")
-    expected_masters = {f"{stem}.png" for stem in list(SPECS)[:26]}
+    expected_masters = {
+        f"{entry.stem}.png" for entry in PACK_ENTRIES
+        if entry.static_source == "master"
+    }
     actual_masters = {path.name for path in (source_root / "masters").glob("*.png")}
     if actual_masters != expected_masters:
         raise ValueError("master PNG inventory does not match raster-authored emoji")
