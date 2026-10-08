@@ -1,13 +1,47 @@
-# Chebaturkin Telegram Heart Pack
+# Emoji Foundry · Фонди и четыре сердца
 
-A focused Telegram custom-emoji pack with four animated hearts:
+Emoji Foundry — небольшой визуальный проект Тимофея Чебатуркина: четыре
+анимированных Telegram-эмоджи и статическая мастерская Фонди вокруг них.
+Репозиторий можно открыть и изучать без аккаунта, сервера или платного API.
 
-- `01-heart`
-- `02-heart-double`
-- `03-heart-open`
-- `27-ira-heart`
+## Веб-мастерская
 
-The upload-ready TGS files are in `01-ready-to-upload/animated-tgs`; WebM
-files are fallbacks. Static 100 × 100 PNG files and GIF previews are included
-for review. Run `cd 04-editable-project && python3 pack.py release` to rebuild
-all generated outputs and checksums.
+Фонди помогает собрать сигнал из сердец, выдержать паузу, упаковать короткую
+записку и сыграть ритм клавишами 1–4. Результат остаётся в браузере; состояние
+сохраняется в ссылке, а открытку можно скачать отдельным HTML или PNG-файлом.
+
+```bash
+python3 site/build.py
+python3 site/serve.py --port 8799
+```
+
+Откройте <http://127.0.0.1:8799/>. Сборка создаёт готовую статическую папку
+`site/public`; её можно разместить на любом хостинге статических файлов.
+
+## Четыре сердца
+
+Текущий набор состоит из `01-heart`, `02-heart-double`, `03-heart-open` и
+`27-ira-heart`. Канонические исходники анимации находятся в
+`04-editable-project/frame_motions`, а проверенные файлы для загрузки — в
+`01-ready-to-upload/animated-tgs`.
+
+После изменения исходников выполни:
+
+```bash
+cd 04-editable-project
+python3 pack.py release
+python3 validate_animated.py
+python3 validate_tgs.py
+python3 -m pytest -q
+```
+
+## Где что лежит
+
+- `site` — workshop, сборка, локальный сервер и браузерная проверка;
+- `brand-kit` — исходные SVG Фонди, шрифт и favicon, которые нужны сайту;
+- `04-editable-project/frame_motions` — редактируемые движения сердец;
+- `01-ready-to-upload`, `02-static-png`, `03-previews` — результаты последнего релиза;
+- `docs` — архитектура, авторинг и решения по визуальной системе.
+
+Сайт и Telegram-пак используют разные визуальные палитры. Для изменений пака
+сначала прочитайте корневой `AGENTS.md`; для мастерской — `site/AGENTS.md`.

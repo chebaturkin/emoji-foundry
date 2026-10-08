@@ -23,3 +23,13 @@ venv/
 # Git worktrees must never be committed into the pack itself.
 .worktrees/
 worktrees/
+
+# Build fingerprints and release staging
+.build-cache/
+.release-*/
+
+# Static workshop build output; regenerate with python3 site/build.py.
+site/assets/
+site/public/
+site/index.html
+site/previews/workshop/
