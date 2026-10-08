@@ -1,5 +1,6 @@
-*.tgs binary
-*.webm binary
-*.gif binary
+# Binary media is kept out of text diffs.
 *.png binary
-04-editable-project/tools/ffmpeg binary
+*.gif binary
+*.webp binary
+*.woff2 binary
+*.ttf binary

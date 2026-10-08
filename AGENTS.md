@@ -1,29 +1,23 @@
-# Chebaturkin Telegram Heart Pack
+# Signal
 
-This project contains exactly four Telegram custom emoji:
+This repository contains the Signal browser workshop and the local visual
+sources it needs. Signal is a static, client-only product centred on the Fondy
+mascot; it has no backend, account system, analytics or external API.
 
-1. `01-heart`
-2. `02-heart-double`
-3. `03-heart-open`
-4. `27-ira-heart`
-
-The canonical animation sources are in `04-editable-project/frame_motions`.
-Generated files in `01-ready-to-upload`, `02-static-png`, `03-previews`,
-`04-editable-project/frames`, `upload`, `tgs_upload`, and `previews` are only
-updated through the build and release commands.
-
-Visible elements may use only BLUE `#2E3A4D`, TAUPE `#C4C1B4`, PAPER
-`#F2F0E9`, and INK `#0D0D0D`. `27-ira-heart` keeps the word `ИРА` in PAPER,
-without an outline.
+Workshop sources live in `site/sections` and `site/lib`. Brand sources used by
+the runtime live in `brand-kit/assets/mascot`, `brand-kit/assets/favicons` and
+`brand-kit/fonts`. Generated files in `site/assets`, `site/index.html` and
+`site/public` are build output and must only be updated through the build.
 
 After a source change, run:
 
 ```bash
-cd 04-editable-project
-python3 pack.py release
-python3 validate_animated.py
-python3 validate_tgs.py
-python3 -m pytest -q
+python3 site/build.py
+python3 -m pytest -q site/tests
+node --test site/tests/test_workshop_state.mjs site/tests/test_workshop_contract.mjs
 ```
 
-Update `SHA256SUMS` through `python3 pack.py release`; do not edit it by hand.
+Do not reintroduce external pack exports or source folders into this
+repository. Keep asset references relative so the generated page works from a
+subpath, and preserve keyboard access plus a reduced-motion path for every
+interactive scene.

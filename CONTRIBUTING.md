@@ -1,10 +1,10 @@
-# Работа над Emoji Foundry
+# Работа над Signal
 
-Emoji Foundry содержит бренд-кит и Fondy workshop. Авторский Telegram-пак
-находится в отдельном проекте `../Чебутуркин Emoji` и имеет собственные
-инструкции в его `AGENTS.md`.
+Signal — маленький статический продукт. Правки интерфейса делаются в
+`site/sections`, чистая логика состояния — в `site/lib`, а исходные медиа
+Фонди и шрифты лежат в `brand-kit`.
 
-После изменения исходников Foundry пересоберите сайт и запустите проверки:
+Перед отправкой изменений пересоберите сайт и запустите проверки:
 
 ```bash
 python3 site/build.py
@@ -12,5 +12,10 @@ python3 -m pytest -q site/tests
 node --test site/tests/test_workshop_state.mjs site/tests/test_workshop_contract.mjs
 ```
 
-Не правьте `site/assets` и `site/public` вручную. Если изменился авторский
-пак, сначала выполните его release и валидаторы, затем пересоберите workshop.
+Для проверки в браузере запустите `python3 site/serve.py --port 8799`, затем
+`python3 site/verify.py`.
+
+Не редактируйте `site/assets`, `site/index.html` и `site/public` вручную:
+это результаты сборки. Сохраняйте относительные пути, доступность клавиатурой
+и поведение при `prefers-reduced-motion: reduce`. Не добавляйте секреты,
+сетевые зависимости или трекинг.

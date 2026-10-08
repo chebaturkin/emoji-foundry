@@ -10,7 +10,7 @@ ROOT=Path(__file__).resolve().parent / "public"
 class LandingHandler(SimpleHTTPRequestHandler):
     def public_request(self):
         path=unquote(urlsplit(self.path).path)
-        if path not in ('/','/index.html','/cases/kroshka.html','/cases/listva.html','/cases/hod.html') and not path.startswith('/assets/'):
+        if path not in ('/','/index.html') and not path.startswith('/assets/'):
             return False
         if path.startswith('/assets/'):
             target=(ROOT/path.lstrip('/')).resolve()
@@ -39,5 +39,5 @@ if __name__=='__main__':
     parser.add_argument('--port',type=int,default=8799)
     args=parser.parse_args()
     server=ThreadingHTTPServer(('127.0.0.1',args.port),partial(LandingHandler,directory=str(ROOT)))
-    print(f'Emoji Foundry landing: http://127.0.0.1:{args.port}',flush=True)
+    print(f'Signal workshop: http://127.0.0.1:{args.port}',flush=True)
     server.serve_forever()

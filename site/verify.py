@@ -1,4 +1,4 @@
-"""Browser smoke test for the built Fondy workshop.
+"""Browser smoke test for the built Signal workshop.
 
 Run ``site/build.py`` and ``site/serve.py`` first. The check stays local and
 writes a small report plus two screenshots to ``site/previews/workshop``.
@@ -54,25 +54,25 @@ with sync_playwright() as playwright:
     report["interactions"].append("scene tabs: ArrowRight moves focus and selection")
 
     page.locator('[role="tab"][data-workshop-mode="signal"]').click()
-    for heart in ("01-heart", "02-heart-double", "03-heart-open", "27-ira-heart", "01-heart"):
-        page.locator(f'.heart-choice[data-heart="{heart}"]').click()
+    for token in ("pulse", "spark", "wave", "anchor", "pulse"):
+        page.locator(f'.token-choice[data-token="{token}"]').click()
     assert page.locator('[data-signal-count]').inner_text() == "4 / 4"
-    assert len(page.evaluate("() => window.__fondyWorkshop.getState().signal")) == 4
+    assert len(page.evaluate("() => window.__signalWorkshop.getState().signal")) == 4
     page.locator('[data-signal-undo]').click()
-    assert len(page.evaluate("() => window.__fondyWorkshop.getState().signal")) == 3
-    report["interactions"].append("signal: four-heart cap, add, and undo")
+    assert len(page.evaluate("() => window.__signalWorkshop.getState().signal")) == 3
+    report["interactions"].append("signal: four-token cap, add, and undo")
 
     page.locator('[role="tab"][data-workshop-mode="letter"]').click()
     page.locator('[data-letter-note]').fill("Я рядом 👩‍🚀")
-    page.locator('[data-note-heart="27-ira-heart"]').click()
+    page.locator('[data-note-token="anchor"]').click()
     page.locator('[data-letter-form]').locator('button[type="submit"]').click()
-    letter_state = page.evaluate("() => window.__fondyWorkshop.getState()")
+    letter_state = page.evaluate("() => window.__signalWorkshop.getState()")
     assert letter_state["note"] == "Я рядом 👩‍🚀"
-    assert letter_state["noteHeart"] == "27-ira-heart"
-    assert page.locator('[data-envelope-heart]').get_attribute("src").endswith("27-ira-heart.png")
+    assert letter_state["noteToken"] == "anchor"
+    assert page.locator('[data-envelope-token]').get_attribute("data-envelope-token") == "anchor"
     signal_before_envelope_click = letter_state["signal"][:]
-    page.locator('[data-envelope-heart]').click()
-    assert page.evaluate("() => window.__fondyWorkshop.getState().signal") == signal_before_envelope_click
+    page.locator('[data-envelope-token]').click()
+    assert page.evaluate("() => window.__signalWorkshop.getState().signal") == signal_before_envelope_click
     report["interactions"].append("letter: grapheme-safe note and selected artwork")
 
     page.locator('[role="tab"][data-workshop-mode="pause"]').click()
@@ -84,11 +84,11 @@ with sync_playwright() as playwright:
     page.locator('[role="tab"][data-workshop-mode="rhythm"]').click()
     for key in ("1", "4", "2"):
         page.keyboard.press(key)
-    rhythm_state = page.evaluate("() => window.__fondyWorkshop.getState()")
+    rhythm_state = page.evaluate("() => window.__signalWorkshop.getState()")
     assert rhythm_state["rhythm"][-3:] == [1, 4, 2]
     saved_hash = page.evaluate("() => location.hash")
     page.reload(wait_until="networkidle")
-    assert page.evaluate("() => window.__fondyWorkshop.getState().rhythm.slice(-3)") == [1, 4, 2]
+    assert page.evaluate("() => window.__signalWorkshop.getState().rhythm.slice(-3)") == [1, 4, 2]
     assert page.evaluate("() => location.hash") == saved_hash
     report["interactions"].append("rhythm: keyboard sequence 1-4-2")
     report["interactions"].append("state: URL hash survives a reload")
@@ -99,10 +99,10 @@ with sync_playwright() as playwright:
 
     with page.expect_download() as download_info:
         page.locator('[data-workshop-action="portable"]').click()
-    assert download_info.value.suggested_filename == "fondy-workshop.html"
+    assert download_info.value.suggested_filename == "signal-postcard.html"
     with page.expect_download() as download_info:
         page.locator('[data-workshop-action="export"]').click()
-    assert download_info.value.suggested_filename in {"fondy-workshop.png", "fondy-workshop.svg"}
+    assert download_info.value.suggested_filename in {"signal-postcard.png", "signal-postcard.svg"}
     report["interactions"].append("exports: portable HTML and image download")
 
     page.emulate_media(reduced_motion="reduce")

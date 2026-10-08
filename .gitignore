@@ -20,13 +20,24 @@ venv/
 *.tmp
 .superpowers/
 
-# Git worktrees must never be committed into the pack itself.
+# Git worktrees must never be committed into the project.
 .worktrees/
 worktrees/
 
 # Build fingerprints and release staging
 .build-cache/
 .release-*/
+
+# Signal has no exported pack or release tree. Keep old archives out of future
+# commits if they are present in a local workspace.
+01-ready-to-upload/
+02-static-png/
+03-previews/
+04-editable-project/
+05-ai-handoff/
+SHA256SUMS
+*-brand-kit-v*.zip
+*-site-v*.zip
 
 # Static workshop build output; regenerate with python3 site/build.py.
 site/assets/

@@ -1,4 +1,4 @@
-/* Fondy workshop runtime. It only talks to native data-* hooks in workshop.html. */
+/* Signal workshop runtime. It only talks to native data-* hooks in workshop.html. */
 (() => {
   'use strict';
 
@@ -8,18 +8,18 @@
   const fallbackState = {
     VERSION: 1,
     MODES: ['signal', 'pause', 'letter', 'rhythm'],
-    HEARTS: ['01-heart', '02-heart-double', '03-heart-open', '27-ira-heart'],
+    TOKENS: ['pulse', 'spark', 'wave', 'anchor'],
     MAX_NOTE: 120, MAX_SIGNAL: 4, MAX_RHYTHM: 32,
-    createDefaultState: () => ({ version: 1, mode: 'signal', signal: [], note: '', noteHeart: '01-heart', rhythm: [] }),
+    createDefaultState: () => ({ version: 1, mode: 'signal', signal: [], note: '', noteToken: 'pulse', rhythm: [] }),
     graphemeLength: text => Array.from(String(text || '')).length,
     truncateGraphemes: (text, max) => Array.from(String(text || '')).slice(0, max || 120).join(''),
     normalizeState(input) {
       const state = this.createDefaultState();
       const source = input && typeof input === 'object' ? input : {};
       if (this.MODES.includes(source.mode)) state.mode = source.mode;
-      state.signal = Array.isArray(source.signal) ? source.signal.filter(item => this.HEARTS.includes(item)).slice(0, 4) : [];
+      state.signal = Array.isArray(source.signal) ? source.signal.filter(item => this.TOKENS.includes(item)).slice(0, 4) : [];
       state.note = typeof source.note === 'string' ? this.truncateGraphemes(source.note, 120) : '';
-      if (this.HEARTS.includes(source.noteHeart)) state.noteHeart = source.noteHeart;
+      if (this.TOKENS.includes(source.noteToken)) state.noteToken = source.noteToken;
       state.rhythm = Array.isArray(source.rhythm) ? source.rhythm.filter(item => Number.isInteger(item) && item > 0 && item < 5).slice(0, 32) : [];
       return state;
     },
@@ -39,18 +39,13 @@
       } catch (_) { return this.createDefaultState(); }
     },
   };
-  const State = window.FondyState || fallbackState;
+  const State = window.SignalState || fallbackState;
   const DEFAULT_STATE = State.createDefaultState();
   const modes = Array.from(State.MODES || ['signal', 'pause', 'letter', 'rhythm']);
-  const hearts = Array.from(State.HEARTS || ['01-heart', '02-heart-double', '03-heart-open', '27-ira-heart']);
-  const heartSet = new Set(hearts);
-  const heartNames = {
-    '01-heart': 'один',
-    '02-heart-double': 'вместе',
-    '03-heart-open': 'открыто',
-    '27-ira-heart': 'личное',
-  };
-  const signalLimit = State.MAX_SIGNAL || 4;
+  const tokens = Array.from(State.TOKENS || ['pulse', 'spark', 'wave', 'anchor']);
+  const tokenSet = new Set(tokens);
+  const tokenNames = { pulse: 'пульс', spark: 'искра', wave: 'волна', anchor: 'якорь' };
+  const signalLimit = State.TOKEN_LIMIT || State.MAX_SIGNAL || 4;
   const rhythmLimit = State.MAX_RHYTHM || 32;
 
   const status = root.querySelector('[data-workshop-status]');
@@ -63,7 +58,7 @@
   const rafs = new Set();
   let state = State.decodeStateHash ? State.decodeStateHash(location.hash) : { ...DEFAULT_STATE };
   let draftNote = '';
-  let draftNoteHeart = state.noteHeart || '01-heart';
+  let draftNoteToken = state.noteToken || 'pulse';
   let rhythmEvents = state.rhythm.map((pad, index) => ({ pad, at: index * 240 }));
   let lastAction = null;
   let activeMode = state.mode;
@@ -92,7 +87,14 @@
   const announce = message => { if (status) status.textContent = message; };
   const sceneFor = mode => scenes.find(scene => scene.dataset.workshopScene === mode);
   const activeScene = () => sceneFor(activeMode);
-  const asset = name => `assets/hearts/${name}.png`;
+  const glyphShapes = {
+    pulse: '<circle cx="50" cy="50" r="28"/><path d="M14 50h18l7-13 10 27 8-17h29"/>',
+    spark: '<path d="M50 8l7 30 30 12-30 7-7 35-8-35-30-7 30-12z"/>',
+    wave: '<path d="M8 55c12-26 24-26 36 0s24 26 36 0 24-26 36 0"/>',
+    anchor: '<circle cx="50" cy="24" r="10"/><path d="M50 34v45M34 55h32M22 70c7 14 19 21 28 21s21-7 28-21"/>',
+  };
+  const glyphSvg = token => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">${glyphShapes[token] || glyphShapes.pulse}</g></svg>`;
+  const glyphDataUri = token => utf8DataUri(glyphSvg(token));
   const isReducedMotion = () => Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   function commitState(next, message) {
@@ -151,6 +153,7 @@
 
   function renderState() {
     state = State.normalizeState ? State.normalizeState(state) : state;
+    renderTokenChoices();
     renderSignal();
     renderLetter();
     renderPause();
@@ -158,15 +161,20 @@
     setMode(activeMode, { announce: false });
   }
 
-  function createImage(heart, className = '') {
-    const image = document.createElement('img');
-    image.src = asset(heart);
-    image.alt = heart;
-    image.className = className;
-    image.loading = 'lazy';
-    image.width = 100;
-    image.height = 100;
-    return image;
+  function renderTokenChoices() {
+    root.querySelectorAll('[data-token]').forEach(button => {
+      const art = button.querySelector('.token-choice-art');
+      if (art) art.innerHTML = glyphSvg(button.dataset.token);
+    });
+  }
+
+  function createGlyph(token, className = '') {
+    const glyph = document.createElement('span');
+    glyph.className = className;
+    glyph.dataset.token = token;
+    glyph.innerHTML = glyphSvg(token);
+    glyph.setAttribute('aria-hidden', 'true');
+    return glyph;
   }
 
   function renderSignal() {
@@ -183,12 +191,12 @@
       slot.append(number);
       if (!state.signal[index]) return;
       slot.classList.add('is-filled');
-      const image = createImage(state.signal[index], 'signal-slot-image');
-      image.alt = `сердце ${index + 1}: ${state.signal[index]}`;
-      slot.append(image);
+      const glyph = createGlyph(state.signal[index], 'signal-slot-glyph');
+      glyph.setAttribute('aria-label', `токен ${index + 1}: ${tokenNames[state.signal[index]] || state.signal[index]}`);
+      slot.append(glyph);
       const controls = document.createElement('span');
       controls.className = 'signal-slot-controls';
-      const remove = slotButton('убрать сердце', '×');
+      const remove = slotButton('убрать токен', '×');
       remove.addEventListener('click', event => { event.stopPropagation(); removeSignal(index); });
       controls.append(remove);
       if (index > 0) {
@@ -205,7 +213,7 @@
     });
     const result = root.querySelector('[data-signal-result]');
     if (result) {
-      result.textContent = state.signal.length ? `сигнал собран: ${state.signal.map(name => heartNames[name] || name).join(' · ')}` : 'здесь появится твой сигнал';
+      result.textContent = state.signal.length ? `сигнал собран: ${state.signal.map(name => tokenNames[name] || name).join(' · ')}` : 'здесь появится твой сигнал';
     }
     root.querySelectorAll('[data-signal-undo]').forEach(button => { button.disabled = !state.signal.length; });
   }
@@ -216,10 +224,10 @@
     return button;
   }
 
-  function addSignalHeart(heart, message = 'сердце добавлено в сигнал') {
-    if (!heartSet.has(heart)) return false;
-    if (state.signal.length >= signalLimit) { announce('сигнал уже собран из четырёх сердец'); return false; }
-    const signal = state.signal.concat(heart);
+  function addSignalToken(token, message = 'токен добавлен в сигнал') {
+    if (!tokenSet.has(token)) return false;
+    if (state.signal.length >= signalLimit) { announce('сигнал уже собран из четырёх токенов'); return false; }
+    const signal = state.signal.concat(token);
     lastAction = { type: 'signal', signal: signal.slice() };
     commitState({ ...state, signal }, message);
     react('signal');
@@ -229,7 +237,7 @@
     if (index < 0 || index >= state.signal.length) return;
     const signal = state.signal.slice(); signal.splice(index, 1);
     lastAction = { type: 'signal', signal: signal.slice() };
-    commitState({ ...state, signal }, 'сердце убрано из сигнала');
+    commitState({ ...state, signal }, 'токен убран из сигнала');
   }
   function reorderSignal(from, to) {
     if (from < 0 || to < 0 || from >= state.signal.length || to >= state.signal.length) return;
@@ -243,17 +251,18 @@
     const counter = root.querySelector('[data-letter-count]');
     if (field && document.activeElement !== field && field.value !== draftNote) field.value = draftNote;
     if (counter) counter.textContent = `${State.graphemeLength ? State.graphemeLength(draftNote) : Array.from(draftNote).length} / 120`;
-    root.querySelectorAll('[data-note-heart]').forEach(button => {
-      const selected = button.dataset.noteHeart === draftNoteHeart;
+    root.querySelectorAll('[data-note-token]').forEach(button => {
+      const selected = button.dataset.noteToken === draftNoteToken;
       button.classList.toggle('is-selected', selected);
       button.setAttribute('aria-pressed', String(selected));
+      const glyph = button.querySelector('.token-glyph');
+      if (glyph) glyph.innerHTML = glyphSvg(button.dataset.noteToken);
     });
-    const heart = root.querySelector('[data-envelope-heart]');
-    if (heart) {
-      heart.src = asset(draftNoteHeart);
-      heart.alt = '';
-      heart.textContent = '';
-      heart.dataset.envelopeHeart = draftNoteHeart;
+    const token = root.querySelector('[data-envelope-token]');
+    if (token) {
+      token.className = `envelope-token token-art-${draftNoteToken}`;
+      token.innerHTML = glyphSvg(draftNoteToken);
+      token.dataset.envelopeToken = draftNoteToken;
     }
     const note = root.querySelector('[data-envelope-note]');
     if (note && !state.note) note.textContent = 'твой текст\nостанется здесь';
@@ -372,8 +381,8 @@
   }
   function submitLetter(event) {
     event.preventDefault();
-    state = State.normalizeState({ ...state, note: draftNote, noteHeart: draftNoteHeart });
-    lastAction = { type: 'letter', note: draftNote, noteHeart: draftNoteHeart };
+    state = State.normalizeState({ ...state, note: draftNote, noteToken: draftNoteToken });
+    lastAction = { type: 'letter', note: draftNote, noteToken: draftNoteToken };
     commitState(state, draftNote ? 'записка сложена в конверт' : 'пустая записка сложена в конверт');
     const envelope = root.querySelector('[data-envelope]');
     if (envelope) { envelope.classList.remove('is-folded'); void envelope.offsetWidth; envelope.classList.add('is-folded'); }
@@ -383,8 +392,8 @@
   function attachSignalDrag(button) {
     button.addEventListener('pointerdown', event => {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
-      const heart = button.dataset.heart;
-      drag = { button, heart, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, moved: false, captured: false };
+      const token = button.dataset.token;
+      drag = { button, token, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, moved: false, captured: false };
       button.classList.add('is-pressed');
       later(() => { if (drag && drag.button === button && !drag.moved) drag.longPress = true; }, 120);
       try { button.setPointerCapture(event.pointerId); drag.captured = true; } catch (_) { /* capture optional */ }
@@ -405,7 +414,7 @@
     button.addEventListener('lostpointercapture', event => { if (drag && drag.button === button && !drag.moved) cancelDrag(button); });
     button.addEventListener('click', event => {
       if (Date.now() < ignoreChoiceClickUntil) { event.preventDefault(); return; }
-      addSignalHeart(button.dataset.heart);
+      addSignalToken(button.dataset.token);
     });
   }
   function finishSignalDrag(event, button) {
@@ -413,7 +422,7 @@
     const current = drag; const stage = root.querySelector('[data-signal-stage]');
     const bounds = stage && stage.getBoundingClientRect();
     const inside = bounds && event.clientX >= bounds.left && event.clientX <= bounds.right && event.clientY >= bounds.top && event.clientY <= bounds.bottom;
-    if (current.moved && inside) { event.preventDefault(); addSignalHeart(current.heart, 'сердце добавлено перетаскиванием'); ignoreChoiceClickUntil = Date.now() + 450; }
+    if (current.moved && inside) { event.preventDefault(); addSignalToken(current.token, 'токен добавлен перетаскиванием'); ignoreChoiceClickUntil = Date.now() + 450; }
     else if (current.moved) ignoreChoiceClickUntil = Date.now() + 450;
     cancelDrag(button);
   }
@@ -475,7 +484,7 @@
     yellow: '#F4D35E', softBlue: '#DFE5FF', softOrange: '#FFE1D6', line: '#D9CFBD',
   };
   const modeTitles = {
-    signal: 'собрать сигнал', pause: 'дать паузу', letter: 'упаковать записку', rhythm: 'сыграть ритм',
+    signal: 'собрать сигнал', pause: 'поймать паузу', letter: 'свернуть записку', rhythm: 'сыграть ритм',
   };
 
   function wrapExportText(value, maxChars = 30, maxLines = 6) {
@@ -511,7 +520,7 @@
     return `<image href="${xmlEscape(uri)}" x="${x}" y="${y}" width="${width}" height="${height}" preserveAspectRatio="xMidYMid meet" ${extra}/>`;
   }
 
-  function svgHeartRow(uris, y = 360) {
+  function svgTokenRow(uris, y = 360) {
     const size = 170; const gap = 24; const startX = 90;
     return uris.map((uri, index) => {
       const x = startX + index * (size + gap);
@@ -520,22 +529,22 @@
   }
 
   function exportHeader(title, mascotUri) {
-    return `<text x="92" y="94" fill="${exportPalette.ink}" font-family="EF Onest, sans-serif" font-size="22" font-weight="700" letter-spacing="1.5">EMOJI FOUNDRY / ФОНДИ</text><circle cx="1090" cy="80" r="10" fill="${exportPalette.orange}"/><circle cx="1120" cy="80" r="6" fill="${exportPalette.blue}"/><text x="92" y="194" fill="${exportPalette.ink}" font-family="EF Dela, sans-serif" font-size="74" letter-spacing="-2">${xmlEscape(title)}</text>${svgImage(mascotUri, 1040, 118, 260, 268)}`;
+    return `<text x="92" y="94" fill="${exportPalette.ink}" font-family="EF Onest, sans-serif" font-size="22" font-weight="700" letter-spacing="1.5">SIGNAL / ФОНДИ</text><circle cx="1090" cy="80" r="10" fill="${exportPalette.orange}"/><circle cx="1120" cy="80" r="6" fill="${exportPalette.blue}"/><text x="92" y="194" fill="${exportPalette.ink}" font-family="EF Dela, sans-serif" font-size="74" letter-spacing="-2">${xmlEscape(title)}</text>${svgImage(mascotUri, 1040, 118, 260, 268)}`;
   }
 
   async function exportSvg() {
     if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (_) { /* fonts are optional */ } }
     const title = modeTitles[activeMode] || modeTitles.signal;
-    const heartIds = activeMode === 'signal' && state.signal.length ? state.signal : [state.noteHeart || state.signal[state.signal.length - 1] || '01-heart'];
-    const [heartUris, mascotUri] = await Promise.all([Promise.all(heartIds.map(name => fileDataUri(asset(name)))), mascotDataUri()]);
+    const tokenIds = activeMode === 'signal' && state.signal.length ? state.signal : [state.noteToken || state.signal[state.signal.length - 1] || 'pulse'];
+    const [tokenUris, mascotUri] = await Promise.all([Promise.resolve(tokenIds.map(name => glyphDataUri(name))), mascotDataUri()]);
     const noteLines = wrapExportText(state.note || 'собери свой жест', 31, 6);
-    const signalLabels = state.signal.map(name => heartNames[name] || name);
+    const signalLabels = state.signal.map(name => tokenNames[name] || name);
     let body = '';
     if (activeMode === 'signal') {
-      body = `<rect x="78" y="288" width="1244" height="425" rx="36" fill="${exportPalette.blue}"/><text x="112" y="336" fill="${exportPalette.paper}" opacity=".7" font-family="EF Onest, sans-serif" font-size="18" font-weight="700" letter-spacing="1">ТВОЙ СИГНАЛ · ${state.signal.length}/4</text>${state.signal.length ? svgHeartRow(heartUris, 380) : `<text x="112" y="500" fill="${exportPalette.paper}" opacity=".82" font-family="EF Onest, sans-serif" font-size="29">добавь первое сердце в мастерской</text>`}<text x="92" y="816" fill="${exportPalette.ink}" font-family="EF Onest, sans-serif" font-size="26" font-weight="700">${xmlEscape(signalLabels.length ? signalLabels.join('  ·  ') : 'сигнал пока пустой')}</text>`;
+      body = `<rect x="78" y="288" width="1244" height="425" rx="36" fill="${exportPalette.blue}"/><text x="112" y="336" fill="${exportPalette.paper}" opacity=".7" font-family="EF Onest, sans-serif" font-size="18" font-weight="700" letter-spacing="1">ТВОЙ СИГНАЛ · ${state.signal.length}/4</text>${state.signal.length ? svgTokenRow(tokenUris, 380) : `<text x="112" y="500" fill="${exportPalette.paper}" opacity=".82" font-family="EF Onest, sans-serif" font-size="29">добавь первый токен в мастерской</text>`}<text x="92" y="816" fill="${exportPalette.ink}" font-family="EF Onest, sans-serif" font-size="26" font-weight="700">${xmlEscape(signalLabels.length ? signalLabels.join('  ·  ') : 'сигнал пока пустой')}</text>`;
     } else if (activeMode === 'letter') {
-      const heartUri = heartUris[0];
-      body = `<rect x="78" y="288" width="1244" height="450" rx="36" fill="${exportPalette.orange}"/><rect x="116" y="340" width="622" height="326" rx="22" fill="${exportPalette.paper}" transform="rotate(-2 427 503)"/><text x="160" y="408" fill="${exportPalette.ink}" opacity=".55" font-family="EF Onest, sans-serif" font-size="16" font-weight="700" letter-spacing="1">ТВОЯ ЗАПИСКА</text><text x="160" y="466" fill="${exportPalette.ink}" font-family="EF Dela, sans-serif" font-size="34" letter-spacing="-.6">${svgLines(noteLines, 160, 466, 43)}</text>${svgImage(heartUri, 630, 560, 72, 72)}<path d="M838 388h340l-170 142-170-142Z" fill="${exportPalette.paper}"/><path d="M838 388v280h340V388" fill="none" stroke="${exportPalette.ink}" stroke-opacity=".18" stroke-width="4"/><path d="M838 668l170-142 170 142" fill="none" stroke="${exportPalette.blue}" stroke-width="8" stroke-linejoin="round"/><text x="860" y="735" fill="${exportPalette.ink}" font-family="EF Onest, sans-serif" font-size="19" font-weight="700">сложено Фонди · можно отправлять</text>`;
+      const tokenUri = tokenUris[0];
+      body = `<rect x="78" y="288" width="1244" height="450" rx="36" fill="${exportPalette.orange}"/><rect x="116" y="340" width="622" height="326" rx="22" fill="${exportPalette.paper}" transform="rotate(-2 427 503)"/><text x="160" y="408" fill="${exportPalette.ink}" opacity=".55" font-family="EF Onest, sans-serif" font-size="16" font-weight="700" letter-spacing="1">ТВОЯ ЗАПИСКА</text><text x="160" y="466" fill="${exportPalette.ink}" font-family="EF Dela, sans-serif" font-size="34" letter-spacing="-.6">${svgLines(noteLines, 160, 466, 43)}</text>${svgImage(tokenUri, 630, 560, 72, 72)}<path d="M838 388h340l-170 142-170-142Z" fill="${exportPalette.paper}"/><path d="M838 388v280h340V388" fill="none" stroke="${exportPalette.ink}" stroke-opacity=".18" stroke-width="4"/><path d="M838 668l170-142 170 142" fill="none" stroke="${exportPalette.blue}" stroke-width="8" stroke-linejoin="round"/><text x="860" y="735" fill="${exportPalette.ink}" font-family="EF Onest, sans-serif" font-size="19" font-weight="700">сложено Фонди · можно отправлять</text>`;
     } else if (activeMode === 'pause') {
       const dots = Array.from({ length: 4 }, (_, index) => { const x = 150 + index * 270; const done = index < pauseStep; return `<circle cx="${x}" cy="480" r="76" fill="${done ? exportPalette.orange : exportPalette.paper}"/><text x="${x}" y="492" text-anchor="middle" fill="${exportPalette.ink}" font-family="EF Dela, sans-serif" font-size="38">0${index + 1}</text>`; }).join('');
       body = `<rect x="78" y="288" width="1244" height="430" rx="36" fill="${exportPalette.ink}"/>${dots}<path d="M226 610H1034" stroke="${exportPalette.paper}" stroke-opacity=".28" stroke-width="3" stroke-dasharray="9 14"/><text x="112" y="784" fill="${exportPalette.ink}" font-family="EF Onest, sans-serif" font-size="28" font-weight="700">${pauseStep >= 4 ? 'пауза собрана — Фонди рядом' : `пройдено шагов: ${pauseStep} из 4`}</text>`;
@@ -551,18 +560,18 @@
   }
   async function exportPng() {
     const svg = await exportSvg();
-    if (!document.createElement('canvas').getContext) { downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'fondy-workshop.svg'); announce('PNG недоступен — сохранён SVG'); return; }
+    if (!document.createElement('canvas').getContext) { downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'signal-postcard.svg'); announce('PNG недоступен — сохранён SVG'); return; }
     const canvas = document.createElement('canvas'); canvas.width = 1400; canvas.height = 900;
     const context = canvas.getContext('2d');
-    if (!context) { downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'fondy-workshop.svg'); announce('PNG недоступен — сохранён SVG'); return; }
+    if (!context) { downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'signal-postcard.svg'); announce('PNG недоступен — сохранён SVG'); return; }
     const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
     try {
       const image = new Image(); image.decoding = 'async'; image.src = url;
       if (image.decode) { try { await image.decode(); } catch (_) { await new Promise(resolve => { image.onload = resolve; image.onerror = resolve; }); } }
       context.drawImage(image, 0, 0, 1400, 900);
       const blob = await new Promise(resolve => canvas.toBlob ? canvas.toBlob(resolve, 'image/png') : resolve(null));
-      if (!blob) { downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'fondy-workshop.svg'); announce('PNG недоступен — сохранён SVG'); return; }
-      downloadBlob(blob, 'fondy-workshop.png'); announce('PNG готов — файл сохранён');
+      if (!blob) { downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'signal-postcard.svg'); announce('PNG недоступен — сохранён SVG'); return; }
+      downloadBlob(blob, 'signal-postcard.png'); announce('PNG готов — файл сохранён');
     } finally { URL.revokeObjectURL(url); }
   }
 
@@ -577,13 +586,13 @@
     return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${xmlEscape(title)} · Фонди</title><style>${style}</style></head><body><main class="postcard" aria-label="Открытка из мастерской Фонди">${svg}<p><strong>${xmlEscape(title)}</strong> · открытка собрана локально в браузере</p></main></body></html>`;
   }
   async function downloadPortable() {
-    try { downloadBlob(new Blob([await createPortableHtml()], { type: 'text/html;charset=utf-8' }), 'fondy-workshop.html'); announce('открытка сохранена — её можно открыть отдельно'); } catch (_) { announce('не удалось собрать открытку'); }
+    try { downloadBlob(new Blob([await createPortableHtml()], { type: 'text/html;charset=utf-8' }), 'signal-postcard.html'); announce('открытка сохранена — её можно открыть отдельно'); } catch (_) { announce('не удалось собрать открытку'); }
   }
 
   function resetCurrentScene() {
     cancelSceneWork();
     if (activeMode === 'signal') { commitState({ ...state, signal: [] }, 'сигнал сброшен — можно собрать заново'); }
-    else if (activeMode === 'letter') { draftNote = ''; draftNoteHeart = '01-heart'; commitState({ ...state, note: '', noteHeart: '01-heart' }, 'записка сброшена — можно написать заново'); }
+    else if (activeMode === 'letter') { draftNote = ''; draftNoteToken = 'pulse'; commitState({ ...state, note: '', noteToken: 'pulse' }, 'записка сброшена — можно написать заново'); }
     else if (activeMode === 'pause') { restartPause(true); announce('пауза сброшена — можно начать заново'); }
     else if (activeMode === 'rhythm') { rhythmEvents = []; commitState({ ...state, rhythm: [] }, 'ритм сброшен — можно сыграть заново'); }
   }
@@ -609,9 +618,9 @@
       setMode(next.dataset.workshopMode, { focus: false });
     });
   });
-  root.querySelectorAll('.heart-choice[data-heart]').forEach(attachSignalDrag);
+  root.querySelectorAll('.token-choice[data-token]').forEach(attachSignalDrag);
   root.querySelectorAll('[data-signal-undo]').forEach(button => button.addEventListener('click', () => removeSignal(state.signal.length - 1)));
-  root.querySelectorAll('[data-note-heart]').forEach(button => button.addEventListener('click', () => { draftNoteHeart = heartSet.has(button.dataset.noteHeart) ? button.dataset.noteHeart : '01-heart'; renderLetter(); }));
+  root.querySelectorAll('[data-note-token]').forEach(button => button.addEventListener('click', () => { draftNoteToken = tokenSet.has(button.dataset.noteToken) ? button.dataset.noteToken : 'pulse'; renderLetter(); }));
   root.querySelectorAll('[data-letter-note]').forEach(field => field.addEventListener('input', onLetterInput));
   root.querySelectorAll('[data-letter-form]').forEach(form => form.addEventListener('submit', submitLetter));
   root.querySelectorAll('[data-pause-step]').forEach(button => {
@@ -639,7 +648,7 @@
     else if (event.key === ' ' && target && target.matches('[data-rhythm-pad]')) { event.preventDefault(); commitBeat(target.dataset.rhythmPad); }
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { cancelAllRafs(); if (pointerFrame) pointerFrame = null; } });
-  window.addEventListener('hashchange', () => { const decoded = State.decodeStateHash ? State.decodeStateHash(location.hash) : fallbackState.decodeStateHash(location.hash); state = decoded; activeMode = decoded.mode; draftNote = decoded.note; draftNoteHeart = decoded.noteHeart; rhythmEvents = decoded.rhythm.map((pad, index) => ({ pad, at: index * 240 })); renderState(); });
+  window.addEventListener('hashchange', () => { const decoded = State.decodeStateHash ? State.decodeStateHash(location.hash) : fallbackState.decodeStateHash(location.hash); state = decoded; activeMode = decoded.mode; draftNote = decoded.note; draftNoteToken = decoded.noteToken; rhythmEvents = decoded.rhythm.map((pad, index) => ({ pad, at: index * 240 })); renderState(); });
 
   function setupPointerAndIdle() {
     if (!mascotWrap || isReducedMotion() || !window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -660,10 +669,10 @@
 
   if (location.hash && State.decodeStateHashResult && !State.decodeStateHashResult(location.hash).valid) announce('ссылка устарела или повреждена');
   if (!state.mode || !modes.includes(state.mode)) state = { ...DEFAULT_STATE };
-  draftNote = state.note || ''; draftNoteHeart = state.noteHeart || '01-heart'; activeMode = state.mode || 'signal';
+  draftNote = state.note || ''; draftNoteToken = state.noteToken || 'pulse'; activeMode = state.mode || 'signal';
   root.querySelectorAll('[data-workshop-navigation]').forEach(nav => { if (!nav.getAttribute('role')) nav.setAttribute('role', 'tablist'); });
   setupPointerAndIdle();
   renderState();
 
-  window.__fondyWorkshop = window.__fondyWorkshop || { root, getState: () => ({ ...state, signal: state.signal.slice(), rhythm: state.rhythm.slice() }), setMode, reset: resetCurrentScene, repeat: repeatCurrent, encodeState: () => State.encodeState(state) };
+  window.__signalWorkshop = window.__signalWorkshop || { root, getState: () => ({ ...state, signal: state.signal.slice(), rhythm: state.rhythm.slice() }), setMode, reset: resetCurrentScene, repeat: repeatCurrent, encodeState: () => State.encodeState(state) };
 })();
