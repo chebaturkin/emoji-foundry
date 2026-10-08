@@ -192,11 +192,11 @@
       if (!state.signal[index]) return;
       slot.classList.add('is-filled');
       const glyph = createGlyph(state.signal[index], 'signal-slot-glyph');
-      glyph.setAttribute('aria-label', `токен ${index + 1}: ${tokenNames[state.signal[index]] || state.signal[index]}`);
+      glyph.setAttribute('aria-label', `знак ${index + 1}: ${tokenNames[state.signal[index]] || state.signal[index]}`);
       slot.append(glyph);
       const controls = document.createElement('span');
       controls.className = 'signal-slot-controls';
-      const remove = slotButton('убрать токен', '×');
+      const remove = slotButton('убрать знак', '×');
       remove.addEventListener('click', event => { event.stopPropagation(); removeSignal(index); });
       controls.append(remove);
       if (index > 0) {
@@ -224,9 +224,9 @@
     return button;
   }
 
-  function addSignalToken(token, message = 'токен добавлен в сигнал') {
+  function addSignalToken(token, message = 'знак добавлен в сигнал') {
     if (!tokenSet.has(token)) return false;
-    if (state.signal.length >= signalLimit) { announce('сигнал уже собран из четырёх токенов'); return false; }
+    if (state.signal.length >= signalLimit) { announce('сигнал уже собран из четырёх знаков'); return false; }
     const signal = state.signal.concat(token);
     lastAction = { type: 'signal', signal: signal.slice() };
     commitState({ ...state, signal }, message);
@@ -237,7 +237,7 @@
     if (index < 0 || index >= state.signal.length) return;
     const signal = state.signal.slice(); signal.splice(index, 1);
     lastAction = { type: 'signal', signal: signal.slice() };
-    commitState({ ...state, signal }, 'токен убран из сигнала');
+    commitState({ ...state, signal }, 'знак убран из сигнала');
   }
   function reorderSignal(from, to) {
     if (from < 0 || to < 0 || from >= state.signal.length || to >= state.signal.length) return;
@@ -422,7 +422,7 @@
     const current = drag; const stage = root.querySelector('[data-signal-stage]');
     const bounds = stage && stage.getBoundingClientRect();
     const inside = bounds && event.clientX >= bounds.left && event.clientX <= bounds.right && event.clientY >= bounds.top && event.clientY <= bounds.bottom;
-    if (current.moved && inside) { event.preventDefault(); addSignalToken(current.token, 'токен добавлен перетаскиванием'); ignoreChoiceClickUntil = Date.now() + 450; }
+    if (current.moved && inside) { event.preventDefault(); addSignalToken(current.token, 'знак добавлен перетаскиванием'); ignoreChoiceClickUntil = Date.now() + 450; }
     else if (current.moved) ignoreChoiceClickUntil = Date.now() + 450;
     cancelDrag(button);
   }
@@ -541,7 +541,7 @@
     const signalLabels = state.signal.map(name => tokenNames[name] || name);
     let body = '';
     if (activeMode === 'signal') {
-      body = `<rect x="78" y="288" width="1244" height="425" rx="36" fill="${exportPalette.blue}"/><text x="112" y="336" fill="${exportPalette.paper}" opacity=".7" font-family="EF Onest, sans-serif" font-size="18" font-weight="700" letter-spacing="1">ТВОЙ СИГНАЛ · ${state.signal.length}/4</text>${state.signal.length ? svgTokenRow(tokenUris, 380) : `<text x="112" y="500" fill="${exportPalette.paper}" opacity=".82" font-family="EF Onest, sans-serif" font-size="29">добавь первый токен в мастерской</text>`}<text x="92" y="816" fill="${exportPalette.ink}" font-family="EF Onest, sans-serif" font-size="26" font-weight="700">${xmlEscape(signalLabels.length ? signalLabels.join('  ·  ') : 'сигнал пока пустой')}</text>`;
+      body = `<rect x="78" y="288" width="1244" height="425" rx="36" fill="${exportPalette.blue}"/><text x="112" y="336" fill="${exportPalette.paper}" opacity=".7" font-family="EF Onest, sans-serif" font-size="18" font-weight="700" letter-spacing="1">ТВОЙ СИГНАЛ · ${state.signal.length}/4</text>${state.signal.length ? svgTokenRow(tokenUris, 380) : `<text x="112" y="500" fill="${exportPalette.paper}" opacity=".82" font-family="EF Onest, sans-serif" font-size="29">добавь первый знак в мастерской</text>`}<text x="92" y="816" fill="${exportPalette.ink}" font-family="EF Onest, sans-serif" font-size="26" font-weight="700">${xmlEscape(signalLabels.length ? signalLabels.join('  ·  ') : 'сигнал пока пустой')}</text>`;
     } else if (activeMode === 'letter') {
       const tokenUri = tokenUris[0];
       body = `<rect x="78" y="288" width="1244" height="450" rx="36" fill="${exportPalette.orange}"/><rect x="116" y="340" width="622" height="326" rx="22" fill="${exportPalette.paper}" transform="rotate(-2 427 503)"/><text x="160" y="408" fill="${exportPalette.ink}" opacity=".55" font-family="EF Onest, sans-serif" font-size="16" font-weight="700" letter-spacing="1">ТВОЯ ЗАПИСКА</text><text x="160" y="466" fill="${exportPalette.ink}" font-family="EF Dela, sans-serif" font-size="34" letter-spacing="-.6">${svgLines(noteLines, 160, 466, 43)}</text>${svgImage(tokenUri, 630, 560, 72, 72)}<path d="M838 388h340l-170 142-170-142Z" fill="${exportPalette.paper}"/><path d="M838 388v280h340V388" fill="none" stroke="${exportPalette.ink}" stroke-opacity=".18" stroke-width="4"/><path d="M838 668l170-142 170 142" fill="none" stroke="${exportPalette.blue}" stroke-width="8" stroke-linejoin="round"/><text x="860" y="735" fill="${exportPalette.ink}" font-family="EF Onest, sans-serif" font-size="19" font-weight="700">сложено Фонди · можно отправлять</text>`;

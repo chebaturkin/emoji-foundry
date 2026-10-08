@@ -13,7 +13,7 @@
     <div class="workshop-hero-copy">
       <p class="workshop-kicker">мастерская Фонди <span aria-hidden="true">✦</span></p>
       <h1 id="workshop-title">передай<br><em>сигнал</em></h1>
-      <p class="workshop-lede">Собери маленький знак из четырёх простых движений. Никаких объяснений — только то, что хочется оставить рядом.</p>
+      <p class="workshop-lede">Собери знак, поймай паузу, сверни записку или сыграй ритм. Фонди ответит на каждое действие.</p>
       <p class="workshop-instruction"><span class="instruction-dot" aria-hidden="true"></span>нажми, потяни, оставь свой сигнал</p>
     </div>
     <figure class="workshop-mascot-wrap" data-fondy-wrap>
@@ -23,24 +23,24 @@
         <span class="workshop-mascot-scribble" aria-hidden="true">на связи!</span>
         <img class="workshop-mascot" data-fondy-mascot src="assets/mascot/fondy-greeting-color-light.svg" alt="Фонди — маленький герой мастерской" width="375" height="385" fetchpriority="high">
       </div>
-      <figcaption>Фонди рядом. Он запоминает<br>только твой сегодняшний сигнал.</figcaption>
+      <figcaption>Фонди рядом.<br>Попробуй — он откликнется.</figcaption>
     </figure>
   </section>
 
   <nav class="workshop-scenes-nav" aria-label="Сцены мастерской" data-workshop-navigation role="tablist">
-    <button class="scene-tab is-active" type="button" role="tab" id="tab-signal" data-workshop-mode="signal" aria-controls="workshop-signal" aria-selected="true" tabindex="0"><span>01</span><strong>собрать сигнал</strong><small>четыре токена</small></button>
+    <button class="scene-tab is-active" type="button" role="tab" id="tab-signal" data-workshop-mode="signal" aria-controls="workshop-signal" aria-selected="true" tabindex="0"><span>01</span><strong>собрать сигнал</strong><small>четыре знака</small></button>
     <button class="scene-tab" type="button" role="tab" id="tab-pause" data-workshop-mode="pause" aria-controls="workshop-pause" aria-selected="false" tabindex="-1"><span>02</span><strong>поймать паузу</strong><small>не спешить</small></button>
     <button class="scene-tab" type="button" role="tab" id="tab-letter" data-workshop-mode="letter" aria-controls="workshop-letter" aria-selected="false" tabindex="-1"><span>03</span><strong>свернуть записку</strong><small>свой текст</small></button>
     <button class="scene-tab" type="button" role="tab" id="tab-rhythm" data-workshop-mode="rhythm" aria-controls="workshop-rhythm" aria-selected="false" tabindex="-1"><span>04</span><strong>сыграть ритм</strong><small>пальцами</small></button>
   </nav>
 
-  <p class="workshop-status" id="workshop-status" data-workshop-status role="status" aria-live="polite" aria-atomic="true">Фонди ждёт первый токен</p>
+  <p class="workshop-status" id="workshop-status" data-workshop-status role="status" aria-live="polite" aria-atomic="true">Фонди ждёт первый знак</p>
 
   <section class="workshop-scene is-active" id="workshop-signal" data-workshop-scene="signal" role="tabpanel" tabindex="0" aria-labelledby="tab-signal signal-title">
     <div class="scene-heading">
       <p class="scene-index">сцена 01 <span aria-hidden="true">/</span> последовательность</p>
       <h2 id="signal-title">собрать сигнал</h2>
-      <p>Выбери до четырёх токенов. Порядок превращает отдельные импульсы в сообщение.</p>
+      <p>Выбери до четырёх знаков. Порядок превращает отдельные импульсы в сообщение.</p>
     </div>
     <div class="signal-layout">
       <div class="signal-stage" data-signal-stage role="group" aria-describedby="signal-help">
@@ -52,16 +52,16 @@
           <span class="signal-slot" data-signal-slot="3"><span>04</span></span>
         </div>
         <img class="signal-stage-mascot" data-fondy-scene-mascot src="assets/mascot/fondy-greeting-color-light.svg" alt="" aria-hidden="true" width="156" height="160">
-        <p class="signal-stage-hint" id="signal-help">Нажми на токен, чтобы добавить его сюда. Перетаскивание тоже работает.</p>
-        <button class="signal-undo" type="button" data-signal-undo aria-label="Удалить последний токен из сигнала" disabled>удалить последний <span aria-hidden="true">↶</span></button>
+        <p class="signal-stage-hint" id="signal-help">Нажми на знак, чтобы добавить его сюда. Перетаскивание тоже работает.</p>
+        <button class="signal-undo" type="button" data-signal-undo aria-label="Удалить последний знак из сигнала" disabled>удалить последний <span aria-hidden="true">↶</span></button>
       </div>
       <div class="token-palette" data-signal-palette role="group" aria-labelledby="signal-palette-title">
         <div class="palette-heading"><h3 id="signal-palette-title">выбери знак</h3><span class="palette-mark" aria-hidden="true">+</span></div>
-        <p class="palette-help" id="signal-choice-help">Добавляет выбранный токен в следующий свободный слот.</p>
-        <button class="token-choice" type="button" draggable="true" data-token="pulse" aria-label="Добавить токен пульс" aria-describedby="signal-choice-help"><span class="token-choice-art token-art-pulse" aria-hidden="true"></span><span class="token-choice-copy"><strong>пульс</strong><small>я здесь</small></span><span class="token-choice-arrow" aria-hidden="true">↗</span></button>
-        <button class="token-choice" type="button" draggable="true" data-token="spark" aria-label="Добавить токен искра" aria-describedby="signal-choice-help"><span class="token-choice-art token-art-spark" aria-hidden="true"></span><span class="token-choice-copy"><strong>искра</strong><small>смотри сюда</small></span><span class="token-choice-arrow" aria-hidden="true">↗</span></button>
-        <button class="token-choice" type="button" draggable="true" data-token="wave" aria-label="Добавить токен волна" aria-describedby="signal-choice-help"><span class="token-choice-art token-art-wave" aria-hidden="true"></span><span class="token-choice-copy"><strong>волна</strong><small>я чувствую</small></span><span class="token-choice-arrow" aria-hidden="true">↗</span></button>
-        <button class="token-choice" type="button" draggable="true" data-token="anchor" aria-label="Добавить токен якорь" aria-describedby="signal-choice-help"><span class="token-choice-art token-art-anchor" aria-hidden="true"></span><span class="token-choice-copy"><strong>якорь</strong><small>я остаюсь</small></span><span class="token-choice-arrow" aria-hidden="true">↗</span></button>
+        <p class="palette-help" id="signal-choice-help">Добавляет выбранный знак в следующее свободное место.</p>
+        <button class="token-choice" type="button" draggable="true" data-token="pulse" aria-label="Добавить знак пульс" aria-describedby="signal-choice-help"><span class="token-choice-art token-art-pulse" aria-hidden="true"></span><span class="token-choice-copy"><strong>пульс</strong><small>я здесь</small></span><span class="token-choice-arrow" aria-hidden="true">↗</span></button>
+        <button class="token-choice" type="button" draggable="true" data-token="spark" aria-label="Добавить знак искра" aria-describedby="signal-choice-help"><span class="token-choice-art token-art-spark" aria-hidden="true"></span><span class="token-choice-copy"><strong>искра</strong><small>смотри сюда</small></span><span class="token-choice-arrow" aria-hidden="true">↗</span></button>
+        <button class="token-choice" type="button" draggable="true" data-token="wave" aria-label="Добавить знак волна" aria-describedby="signal-choice-help"><span class="token-choice-art token-art-wave" aria-hidden="true"></span><span class="token-choice-copy"><strong>волна</strong><small>я чувствую</small></span><span class="token-choice-arrow" aria-hidden="true">↗</span></button>
+        <button class="token-choice" type="button" draggable="true" data-token="anchor" aria-label="Добавить знак якорь" aria-describedby="signal-choice-help"><span class="token-choice-art token-art-anchor" aria-hidden="true"></span><span class="token-choice-copy"><strong>якорь</strong><small>я остаюсь</small></span><span class="token-choice-arrow" aria-hidden="true">↗</span></button>
       </div>
     </div>
     <p class="scene-result" data-signal-result>здесь появится твой сигнал</p>
@@ -78,7 +78,7 @@
       <div class="pause-steps" role="group" aria-label="Шаги паузы" data-pause-steps>
         <button class="pause-step is-current" type="button" data-pause-step="1" aria-pressed="false"><span>01</span><strong>заметь</strong><small>остановиться</small></button>
         <button class="pause-step" type="button" data-pause-step="2" aria-pressed="false"><span>02</span><strong>удержи</strong><small>не спешить</small></button>
-        <button class="pause-step" type="button" data-pause-step="3" aria-pressed="false"><span>03</span><strong>отпусти</strong><small>дать месту</small></button>
+        <button class="pause-step" type="button" data-pause-step="3" aria-pressed="false"><span>03</span><strong>отпусти</strong><small>освободить место</small></button>
         <button class="pause-step" type="button" data-pause-step="4" aria-pressed="false"><span>04</span><strong>останься</strong><small>готово</small></button>
       </div>
     </div>
@@ -90,7 +90,7 @@
     <div class="scene-heading">
       <p class="scene-index">сцена 03 <span aria-hidden="true">/</span> бумага и жест</p>
       <h2 id="letter-title">свернуть записку</h2>
-      <p>Напиши коротко. Выбери токен. Фонди сложит всё в один конверт.</p>
+      <p>Напиши коротко. Выбери знак. Фонди сложит всё в один конверт.</p>
     </div>
     <div class="letter-layout">
       <form class="letter-form" data-letter-form>
@@ -99,10 +99,10 @@
         <div class="field-meta" id="letter-note-help"><span>до 120 знаков</span><span id="letter-note-count" data-letter-count>0 / 120</span></div>
         <fieldset class="letter-tokens"><legend>какой знак положить внутрь?</legend>
           <div class="letter-token-options">
-            <button class="letter-token is-selected" type="button" data-note-token="pulse" aria-label="Выбрать токен пульс" aria-pressed="true"><span class="token-glyph token-art-pulse" aria-hidden="true"></span><span class="visually-hidden">пульс</span></button>
-            <button class="letter-token" type="button" data-note-token="spark" aria-label="Выбрать токен искра" aria-pressed="false"><span class="token-glyph token-art-spark" aria-hidden="true"></span><span class="visually-hidden">искра</span></button>
-            <button class="letter-token" type="button" data-note-token="wave" aria-label="Выбрать токен волна" aria-pressed="false"><span class="token-glyph token-art-wave" aria-hidden="true"></span><span class="visually-hidden">волна</span></button>
-            <button class="letter-token" type="button" data-note-token="anchor" aria-label="Выбрать токен якорь" aria-pressed="false"><span class="token-glyph token-art-anchor" aria-hidden="true"></span><span class="visually-hidden">якорь</span></button>
+            <button class="letter-token is-selected" type="button" data-note-token="pulse" aria-label="Выбрать знак пульс" aria-pressed="true"><span class="token-glyph token-art-pulse" aria-hidden="true"></span><span class="visually-hidden">пульс</span></button>
+            <button class="letter-token" type="button" data-note-token="spark" aria-label="Выбрать знак искра" aria-pressed="false"><span class="token-glyph token-art-spark" aria-hidden="true"></span><span class="visually-hidden">искра</span></button>
+            <button class="letter-token" type="button" data-note-token="wave" aria-label="Выбрать знак волна" aria-pressed="false"><span class="token-glyph token-art-wave" aria-hidden="true"></span><span class="visually-hidden">волна</span></button>
+            <button class="letter-token" type="button" data-note-token="anchor" aria-label="Выбрать знак якорь" aria-pressed="false"><span class="token-glyph token-art-anchor" aria-hidden="true"></span><span class="visually-hidden">якорь</span></button>
           </div>
         </fieldset>
         <button class="workshop-button workshop-button-primary" type="submit" data-letter-submit>свернуть записку <span aria-hidden="true">↗</span></button>
@@ -119,7 +119,7 @@
     <div class="scene-heading">
       <p class="scene-index">сцена 04 <span aria-hidden="true">/</span> четыре клавиши</p>
       <h2 id="rhythm-title">сыграть ритм</h2>
-      <p>Собери короткий паттерн пальцами или клавишами 1–4. Здесь не нужно быть музыкантом.</p>
+      <p>Собери короткий ритм пальцами или клавишами 1–4. Здесь не нужно быть музыкантом.</p>
     </div>
     <div class="rhythm-layout">
       <div class="rhythm-pads" role="group" aria-label="Клавиши ритма" data-rhythm-pads>
