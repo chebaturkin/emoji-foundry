@@ -8,6 +8,11 @@
 
 **Tech Stack:** Static HTML, CSS, vanilla JavaScript, local SVG mascot, local Dela/Onest fonts, Python build, Node tests.
 
+**Verification, 2026-10-09:** The build succeeded; 2 Python tests and 9 Node
+tests passed. `site/verify.py` passed at 320, 390, 768, 1024, and 1440px with
+9 interaction checks. Desktop and mobile screenshots were inspected, and the
+README preview was refreshed from the verified desktop build.
+
 ---
 
 ### Task 1: Rewrite the authored structure and interface copy
